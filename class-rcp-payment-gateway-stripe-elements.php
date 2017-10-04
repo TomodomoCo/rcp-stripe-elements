@@ -138,6 +138,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	 */
 	public function update_fields() {
 		parent::init();
+
 		$this->scripts();
 
 		return $this->fields();
@@ -149,7 +150,8 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	 * @return void
 	 */
 	public function scripts() {
-		wp_enqueue_script( 'stripe-elements', 'https://js.stripe.com/v3/', array( 'jquery' ) );
+		wp_register_script( 'stripe-elements', 'https://js.stripe.com/v3/', array( 'jquery' ) );
+		wp_enqueue_script( 'stripe-elements' );
 	}
 
 	/**
