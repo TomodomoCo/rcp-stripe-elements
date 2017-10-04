@@ -10,6 +10,15 @@ Stripe payment gateway for Restrict Content Pro, using [Stripe Elements](https:/
 4. ...
 5. Profit (literally)
 
+## More Detailed Usage
+
+A few notes:
+
++ You'll need to set your Stripe options in the RCP Payment Settings screen.
++ If you're migrating from RCP's included Stripe gateway, it's easy: just uncheck the Stripe gateway and check the Stripe Elements gateway.
++ You'll need to style the class `.rcp-stripe-elements-input` to resemble your default input style (with a border and padding).
++ You can use the `rcp_stripe_elements_form_data` filter to pass in custom options to the Elements field. More information on the available options are in [Stripe's documentation](https://stripe.com/docs/stripe.js#element-options).
+
 ## About Tomodomo
 
 Tomodomo is a creative agency for communities. We focus on unique design and technical solutions to grow community activity and increase customer retention for online networking forums and customer service communities.
