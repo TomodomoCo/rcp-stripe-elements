@@ -60,4 +60,3 @@ function rcp_elements_custom_template_path( $template_stack, $template_names ) {
 	return $template_stack;
 }
 add_filter( 'rcp_template_stack', 'rcp_elements_custom_template_path', 10, 2 );
-

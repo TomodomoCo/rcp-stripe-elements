@@ -17,7 +17,10 @@
 		<?php foreach( $cards as $card ) : ?>
 			<fieldset class="rcp_current_cards_fieldset">
 				<p>
+					<?php if( isset( $card['name'] ) ): ?>
 					<span class="rcp_card_details_name"><?php _e( 'Name:', 'rcp' ); ?> <?php echo $card['name']; ?></span>
+					<?php endif; ?>
+
 					<span class="rcp_card_details_type"><?php _e( 'Type:', 'rcp' ); ?> <?php echo $card['type']; ?></span>
 					<span class="rcp_card_details_last4"><?php _e( 'Last 4:', 'rcp' ); ?> <?php echo $card['last4']; ?></span>
 					<span class="rcp_card_details_exp"><?php _e( 'Exp:', 'rcp' ); ?> <?php echo $card['exp_month'] . ' / ' . $card['exp_year']; ?></span>
@@ -25,5 +28,16 @@
 			</fieldset>
 		<?php endforeach; ?>
 	<?php endif; ?>
+
+	<?php
+
+		// Output `RCP_Payment_Gateway_Stripe_Elements` update fields
+		$gateway = new RCP_Payment_Gateway_Stripe_Elements();
+		$gateway->init();
+		$gateway->scripts();
+
+		echo $gateway->fields();
+
+	?>
 
 </form>
