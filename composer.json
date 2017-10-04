@@ -1,0 +1,23 @@
+{
+    "name": "tomodomoco/rcp-stripe-elements",
+    "description": "Stripe payment gateway for Restrict Content Pro, using Stripe Elements for the payment form.",
+    "keywords": [
+        "wordpress",
+        "plugin"
+    ],
+    "homepage": "https://tomodomo.co/",
+    "authors": [
+        {
+            "name": "Chris Van Patten",
+            "homepage": "http://www.chrisvanpatten.com/"
+        },
+        {
+            "name": "Ian McFarlan",
+            "homepage": "http://mcfarlan.ca/"
+        }
+    ],
+    "type": "wordpress-plugin",
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
