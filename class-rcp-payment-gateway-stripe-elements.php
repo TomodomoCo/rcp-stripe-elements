@@ -132,12 +132,24 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	}
 
 	/**
+	 * Print form fields for this Gateway on `update billing` view in RCP
+	 *
+	 * @return string
+	 */
+	public function update_fields() {
+		parent::init();
+		$this->scripts();
+
+		return $this->fields();
+	}
+
+	/**
 	 * Load Stripe Elements JS; dequeue Stripe Checkout JS
 	 *
 	 * @return void
 	 */
 	public function scripts() {
-		wp_enqueue_script( 'stripe-elements', 'https://js.stripe.com/v3/' );
+		wp_enqueue_script( 'stripe-elements', 'https://js.stripe.com/v3/', array( 'jquery' ) );
 	}
 
 	/**

@@ -33,10 +33,7 @@
 
 		// Output `RCP_Payment_Gateway_Stripe_Elements` update fields
 		$gateway = new RCP_Payment_Gateway_Stripe_Elements();
-		$gateway->init();
-		$gateway->scripts();
-
-		echo $gateway->fields();
+		echo $gateway->update_fields();
 
 	?>
 
