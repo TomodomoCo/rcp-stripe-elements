@@ -106,7 +106,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				}
 
 				// Discounted at 100%, pass without token/charge to avoid JS error
-				if( jQuery( '.rcp_gateway_fields' ).hasClass( 'rcp_discounted_100' ) ) {
+				if ( jQuery( '.rcp_gateway_fields' ).hasClass( 'rcp_discounted_100' ) ) {
 					return true;
 				}
 
