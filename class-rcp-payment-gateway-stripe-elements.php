@@ -29,7 +29,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			'style' => array(
 				'base' => array(
 					'fontFamily' => 'Arial, sans-serif',
-					'fontSize'   => '15px',
+					'fontSize'   => '16px',
 					'color'      => 'black',
 				),
 				'invalid' => array(
@@ -42,7 +42,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 
 		<div class="form-row">
 			<label for="card-element"><?php _e( 'Credit or debit card', 'rcp' ); ?></label>
-			<div id="card-element"></div>
+			<div id="card-element" class="rcp-stripe-elements-input"></div>
 			<div id="card-errors" role="alert"></div>
 		</div>
 		<br>
@@ -56,7 +56,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			elementsArgs = <?php echo json_encode( $data ); ?>;
 
 			// Create and mount the card
-			card = elements.create( 'card', <?php echo json_decode( $data ); ?> );
+			card = elements.create( 'card', elementsArgs );
 			card.mount( '#card-element' );
 
 			// Listen for errors during type in Stripe Elements
