@@ -48,12 +48,19 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 		<br>
 
 		<script>
-			var stripe, elements, card, elementsArgs;
+			var stripe, elements, card, elementsArgs, form_id;
 
 			// Load Stripe Elements
 			stripe       = Stripe('<?php echo $this->publishable_key; ?>');
 			elements     = stripe.elements();
 			elementsArgs = <?php echo json_encode( $data ); ?>;
+
+			// Get form_id; `rcp_registration_form` || `rcp_update_card_form`
+			if ( document.getElementById( 'rcp_update_card_form' ).length > 0 ) {
+				form_id = 'rcp_update_card_form';
+			} else {
+				form_id = 'rcp_registration_form';
+			}
 
 			// Create and mount the card
 			card = elements.create( 'card', elementsArgs );
@@ -67,7 +74,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				if ( event.error ) {
 					displayError.textContent = event.error.message;
 
-					var submission_form = jQuery( '#rcp_registration_form' );
+					var submission_form = jQuery( '#' + form_id );
 					submission_form.unblock();
 
 				// No errors, pass blank string
@@ -81,7 +88,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				var form, hiddenInput;
 
 				// Insert the token ID into the form so it gets submitted to the server
-				form        = document.getElementById( 'rcp_registration_form' );
+				form        = document.getElementById( form_id );
 				hiddenInput = document.createElement( 'input' );
 
 				// Assign attributes to hidden field
@@ -94,11 +101,27 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				form.submit();
 			}
 
+			// Attempts the creation of a Stripe Token
+			function attemptStripeTokenCreation() {
+				stripe.createToken( card ).then( function( result ) {
+
+					// Errors present
+					if ( result.error ) {
+						var errorElement = document.getElementById( 'card-errors' );
+						errorElement.textContent = result.error.message;
+
+						// Token created, ready to send to server
+					} else {
+						stripeTokenHandler( result.token );
+					}
+				});
+			}
+
 			/**
 			 * 'rcp_register_form_submission' is triggered in register.js
 			 * if the form data is successfully validated.
 			 */
-			jQuery( 'body' ).off( 'rcp_register_form_submission' ).on( 'rcp_register_form_submission', function( e, response, form_id ) {
+			jQuery( 'body' ).off( 'rcp_register_form_submission' ).on( 'rcp_register_form_submission', function( e, response ) {
 
 				// Bail early if not stripe elements
 				if ( response.gateway.slug !== 'stripe_elements' ) {
@@ -110,20 +133,15 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 					return true;
 				}
 
-				// Create a Stripe token
-				stripe.createToken( card ).then( function( result ) {
+				attemptStripeTokenCreation();
+			} );
 
-					// Errors present
-					if ( result.error ) {
-						var errorElement = document.getElementById( 'card-errors' );
-						errorElement.textContent = result.error.message;
-
-					// Token created, ready to send to server
-					} else {
-						stripeTokenHandler( result.token );
-					}
-				});
-
+			/**
+			 * Update billing form submissions
+			 */
+			jQuery( 'body' ).on( 'click', '#rcp_submit[name="rcp_submit_card_update"]', {}, function( evt ) {
+				evt.preventDefault();
+				attemptStripeTokenCreation();
 			} );
 		</script>
 
