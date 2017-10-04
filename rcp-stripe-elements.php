@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function rcp_elements_register_stripe_elements_gateway( $gateways ) {
 	// Exit early if the stripe_elements gateway or class already exist
-	if ( isset( $gateways['stripe_elements'] ) || class_exists( 'RCP_Payment_Gateway_Stripe_Elements' ) ) {
+	if ( isset( $gateways['stripe_elements'] ) ) {
 		return $gateways;
 	}
 
@@ -37,8 +37,10 @@ function rcp_elements_register_stripe_elements_gateway( $gateways ) {
 	);
 
 	// Include RCP Stripe Elements Gateway
-	$path = trailingslashit( plugin_dir_path( __FILE__ ) );
-	require_once $path . 'class-rcp-payment-gateway-stripe-elements.php';
+	if ( ! class_exists( 'RCP_Payment_Gateway_Stripe_Elements' ) ) {
+		$path = trailingslashit( plugin_dir_path( __FILE__ ) );
+		require_once $path . 'class-rcp-payment-gateway-stripe-elements.php';
+	}
 
 	return $gateways;
 }
