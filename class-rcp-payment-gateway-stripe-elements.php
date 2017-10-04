@@ -38,6 +38,15 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			),
 		) );
 
+		// Set `form_id` if on RCP Update Billing page
+		if ( rcp_elements_is_update_card_page() !== false ) {
+			$form_id = apply_filters( 'rcp_elements_update_form_id', 'rcp_update_card_form' );
+
+		// Set `form_id` if on RCP Registration page
+		} else {
+			$form_id = apply_filters( 'rcp_elements_registration_form_id', 'rcp_registration_form' );
+		}
+
 		ob_start(); ?>
 
 		<div class="form-row">
@@ -54,13 +63,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			stripe       = Stripe('<?php echo $this->publishable_key; ?>');
 			elements     = stripe.elements();
 			elementsArgs = <?php echo json_encode( $data ); ?>;
-
-			// Get form_id; `rcp_registration_form` || `rcp_update_card_form`
-			if ( document.getElementById( 'rcp_update_card_form' ).length > 0 ) {
-				form_id = 'rcp_update_card_form';
-			} else {
-				form_id = 'rcp_registration_form';
-			}
+			form_id 	 = '<?php echo $form_id; ?>';
 
 			// Create and mount the card
 			card = elements.create( 'card', elementsArgs );
@@ -139,7 +142,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			/**
 			 * Update billing form submissions
 			 */
-			jQuery( 'body' ).on( 'click', '#rcp_submit[name="rcp_submit_card_update"]', {}, function( evt ) {
+			jQuery( 'body' ).on( 'click', '#' + form_id + ' #rcp_submit', {}, function( evt ) {
 				evt.preventDefault();
 				attemptStripeTokenCreation();
 			} );
