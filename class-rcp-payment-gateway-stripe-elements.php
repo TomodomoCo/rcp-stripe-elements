@@ -139,8 +139,6 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	public function update_fields() {
 		parent::init();
 
-		$this->scripts();
-
 		return $this->fields();
 	}
 

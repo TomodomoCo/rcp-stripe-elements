@@ -60,3 +60,37 @@ function rcp_elements_custom_template_path( $template_stack, $template_names ) {
 	return $template_stack;
 }
 add_filter( 'rcp_template_stack', 'rcp_elements_custom_template_path', 10, 2 );
+
+/**
+ * Conditionally loads Stripe Elements JS for the `update card` page
+ *
+ * @return void
+ */
+function rcp_elements_load_scripts() {
+
+	// Bail early if scripts shouldn't be loaded
+	if ( rcp_elements_is_update_card_page() === false ) {
+		return;
+	}
+
+	$gateway = new RCP_Payment_Gateway_Stripe_Elements();
+	$gateway->scripts();
+}
+add_action( 'wp_enqueue_scripts', 'rcp_elements_load_scripts', 10, 0 );
+
+/**
+ * Checks if the current page is the RCP update card page
+ *
+ * @return bool
+ */
+function rcp_elements_is_update_card_page() {
+	global $rcp_options;
+
+	$page_id = get_the_ID();
+
+	if ( $rcp_options['update_card'] != $page_id ) {
+		return false;
+	}
+
+	return true;
+}
