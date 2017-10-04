@@ -110,7 +110,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 						var errorElement = document.getElementById( 'card-errors' );
 						errorElement.textContent = result.error.message;
 
-						// Token created, ready to send to server
+					// Token created, ready to send to server
 					} else {
 						stripeTokenHandler( result.token );
 					}
@@ -161,7 +161,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	}
 
 	/**
-	 * Load Stripe Elements JS; dequeue Stripe Checkout JS
+	 * Load Stripe Elements JS
 	 *
 	 * @return void
 	 */

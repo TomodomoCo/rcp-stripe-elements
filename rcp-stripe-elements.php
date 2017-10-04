@@ -81,16 +81,20 @@ add_action( 'wp_enqueue_scripts', 'rcp_elements_load_scripts', 10, 0 );
 /**
  * Checks if the current page is the RCP update card page
  *
- * @return bool
+ * @return bool $ret
  */
 function rcp_elements_is_update_card_page() {
-	global $rcp_options;
+	global $rcp_options, $post;
 
-	$page_id = get_the_ID();
+	$ret = false;
 
-	if ( $rcp_options['update_card'] != $page_id ) {
-		return false;
+	if ( isset( $rcp_options['update_card'] ) ) {
+		$ret = is_page( $rcp_options['update_card'] );
 	}
 
-	return true;
+	if ( ! empty( $post ) && has_shortcode( $post->post_content, 'rcp_update_card' ) ) {
+		$ret = true;
+	}
+
+	return $ret;
 }
