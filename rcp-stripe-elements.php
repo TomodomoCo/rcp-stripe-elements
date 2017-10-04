@@ -24,6 +24,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array $gateways
  */
 function rcp_elements_register_stripe_elements_gateway( $gateways ) {
+	// Exit early if the stripe_elements gateway or class already exist
+	if ( isset( $gateways['stripe_elements'] ) || class_exists( 'RCP_Payment_Gateway_Stripe_Elements' ) ) {
+		return $gateways;
+	}
+
+	// Define the stripe_elements gateway
 	$gateways['stripe_elements'] = array(
 		'label'        => 'Stripe Elements',
 		'admin_label'  => 'Stripe Elements',
