@@ -4,7 +4,7 @@ Stripe payment gateway for Restrict Content Pro, using [Stripe Elements](https:/
 
 ## Usage
 
-1. Download the zip
+1. Download the [latest release](https://github.com/TomodomoCo/rcp-stripe-elements/releases/latest)
 2. Install the plugin
 3. Activate the plugin
 4. ...

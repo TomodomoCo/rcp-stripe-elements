@@ -45,3 +45,54 @@ function rcp_elements_register_stripe_elements_gateway( $gateways ) {
 	return $gateways;
 }
 add_filter( 'rcp_payment_gateways', 'rcp_elements_register_stripe_elements_gateway' );
+
+/**
+ * Custom path for RCP template overrides
+ *
+ * @param array  $template_stack
+ * @param string $template_names
+ *
+ * @return array $template_stack
+ */
+function rcp_elements_custom_template_path( $template_stack, $template_names ) {
+	$template_stack[] = trailingslashit( plugin_dir_path( __FILE__ ) ) . 'templates/';
+
+	return $template_stack;
+}
+add_filter( 'rcp_template_stack', 'rcp_elements_custom_template_path', 10, 2 );
+
+/**
+ * Conditionally loads Stripe Elements JS for the `update card` page
+ *
+ * @return void
+ */
+function rcp_elements_load_scripts() {
+
+	// Bail early if scripts shouldn't be loaded
+	if ( rcp_elements_is_update_card_page() === false ) {
+		return;
+	}
+
+	$gateway = new RCP_Payment_Gateway_Stripe_Elements();
+	$gateway->scripts();
+}
+add_action( 'wp_enqueue_scripts', 'rcp_elements_load_scripts', 10, 0 );
+
+/**
+ * Checks if the current page is the RCP update card page
+ *
+ * @return bool
+ */
+function rcp_elements_is_update_card_page() {
+	global $rcp_options, $post;
+
+	if ( isset( $rcp_options['update_card'] ) ) {
+		return is_page( $rcp_options['update_card'] );
+	}
+
+	if ( ! empty( $post ) && has_shortcode( $post->post_content, 'rcp_update_card' ) ) {
+		return true;
+	}
+
+	return false;
+}

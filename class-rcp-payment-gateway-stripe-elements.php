@@ -38,6 +38,15 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			),
 		) );
 
+		// Set `form_id` if on RCP Update Billing page
+		if ( rcp_elements_is_update_card_page() !== false ) {
+			$form_id = apply_filters( 'rcp_elements_update_form_id', 'rcp_update_card_form' );
+
+		// Set `form_id` if on RCP Registration page
+		} else {
+			$form_id = apply_filters( 'rcp_elements_registration_form_id', 'rcp_registration_form' );
+		}
+
 		ob_start(); ?>
 
 		<div class="form-row">
@@ -48,12 +57,13 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 		<br>
 
 		<script>
-			var stripe, elements, card, elementsArgs;
+			var stripe, elements, card, elementsArgs, form_id;
 
 			// Load Stripe Elements
 			stripe       = Stripe('<?php echo $this->publishable_key; ?>');
 			elements     = stripe.elements();
 			elementsArgs = <?php echo json_encode( $data ); ?>;
+			form_id 	 = '<?php echo $form_id; ?>';
 
 			// Create and mount the card
 			card = elements.create( 'card', elementsArgs );
@@ -67,7 +77,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				if ( event.error ) {
 					displayError.textContent = event.error.message;
 
-					var submission_form = jQuery( '#rcp_registration_form' );
+					var submission_form = jQuery( '#' + form_id );
 					submission_form.unblock();
 
 				// No errors, pass blank string
@@ -81,7 +91,7 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				var form, hiddenInput;
 
 				// Insert the token ID into the form so it gets submitted to the server
-				form        = document.getElementById( 'rcp_registration_form' );
+				form        = document.getElementById( form_id );
 				hiddenInput = document.createElement( 'input' );
 
 				// Assign attributes to hidden field
@@ -94,23 +104,8 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 				form.submit();
 			}
 
-			/**
-			 * 'rcp_register_form_submission' is triggered in register.js
-			 * if the form data is successfully validated.
-			 */
-			jQuery( 'body' ).off( 'rcp_register_form_submission' ).on( 'rcp_register_form_submission', function( e, response, form_id ) {
-
-				// Bail early if not stripe elements
-				if ( response.gateway.slug !== 'stripe_elements' ) {
-					return;
-				}
-
-				// Discounted at 100%, pass without token/charge to avoid JS error
-				if ( jQuery( '.rcp_gateway_fields' ).hasClass( 'rcp_discounted_100' ) ) {
-					return true;
-				}
-
-				// Create a Stripe token
+			// Attempts the creation of a Stripe Token
+			function attemptStripeTokenCreation() {
 				stripe.createToken( card ).then( function( result ) {
 
 					// Errors present
@@ -123,7 +118,33 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 						stripeTokenHandler( result.token );
 					}
 				});
+			}
 
+			/**
+			 * 'rcp_register_form_submission' is triggered in register.js
+			 * if the form data is successfully validated.
+			 */
+			jQuery( 'body' ).off( 'rcp_register_form_submission' ).on( 'rcp_register_form_submission', function( e, response ) {
+
+				// Bail early if not stripe elements
+				if ( response.gateway.slug !== 'stripe_elements' ) {
+					return;
+				}
+
+				// Discounted at 100%, pass without token/charge to avoid JS error
+				if ( jQuery( '.rcp_gateway_fields' ).hasClass( 'rcp_discounted_100' ) ) {
+					return true;
+				}
+
+				attemptStripeTokenCreation();
+			} );
+
+			/**
+			 * Update billing form submissions
+			 */
+			jQuery( 'body' ).on( 'click', '#' + form_id + ' #rcp_submit', {}, function( evt ) {
+				evt.preventDefault();
+				attemptStripeTokenCreation();
 			} );
 		</script>
 
@@ -132,12 +153,24 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 	}
 
 	/**
-	 * Load Stripe Elements JS; dequeue Stripe Checkout JS
+	 * Print form fields for this Gateway on `update billing` view in RCP
+	 *
+	 * @return string
+	 */
+	public function update_fields() {
+		parent::init();
+
+		return $this->fields();
+	}
+
+	/**
+	 * Load Stripe Elements JS
 	 *
 	 * @return void
 	 */
 	public function scripts() {
-		wp_enqueue_script( 'stripe-elements', 'https://js.stripe.com/v3/' );
+		wp_register_script( 'stripe-elements', 'https://js.stripe.com/v3/', array( 'jquery' ) );
+		wp_enqueue_script( 'stripe-elements' );
 	}
 
 	/**
