@@ -90,18 +90,26 @@ class RCP_Payment_Gateway_Stripe_Elements extends RCP_Payment_Gateway_Stripe {
 			function stripeTokenHandler( token ) {
 				var form, hiddenInput;
 
-				// Insert the token ID into the form so it gets submitted to the server
-				form        = document.getElementById( form_id );
-				hiddenInput = document.createElement( 'input' );
+				// Use token if already present, work around for better Chrome support during redirects
+				if ( document.getElementById( 'stripeToken' ) ) {
+					hiddenInput = document.getElementById( 'stripeToken' );
 
-				// Assign attributes to hidden field
-				hiddenInput.setAttribute( 'type', 'hidden' );
-				hiddenInput.setAttribute( 'name', 'stripeToken' );
-				hiddenInput.setAttribute( 'value', token.id );
-				hiddenInput.setAttribute( 'id', 'stripeToken' );
+				// If token isn't present in DOM, create new one and submit form
+				} else {
+					hiddenInput = document.createElement( 'input' );
 
-				form.appendChild( hiddenInput );
-				form.submit();
+					// Append the token form field into the form with applicable attributes
+					form = document.getElementById( form_id );
+
+					// Assign attributes to hidden field
+					hiddenInput.setAttribute( 'type', 'hidden' );
+					hiddenInput.setAttribute( 'name', 'stripeToken' );
+					hiddenInput.setAttribute( 'value', token.id );
+					hiddenInput.setAttribute( 'id', 'stripeToken' );
+
+					form.appendChild( hiddenInput );
+					form.submit();
+				}
 			}
 
 			// Attempts the creation of a Stripe Token
