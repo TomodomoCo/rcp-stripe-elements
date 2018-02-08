@@ -3,7 +3,7 @@
 Plugin Name: Restrict Content Pro Stripe Elements Gateway
 Plugin URI: http://www.vanpattenmedia.com/
 Description: Accept payments using Stripe Elements
-Version: 1.0.0
+Version: 1.2.3
 Text Domain: rcp-stripe-elements
 Domain Path: /languages
 Author: Van Patten Media Inc.
