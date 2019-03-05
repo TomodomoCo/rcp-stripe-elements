@@ -107,7 +107,7 @@ function rcp_elements_is_update_card_page() {
  * @return bool Whether or not the membership can be cancelled.
  */
 function rcp_elements_can_cancel( $can_cancel, $membership_id, $membership ) {
-	if ( 'stripe_elements' != $membership->get_gateway() ) {
+	if ( $membership->get_gateway() !== 'stripe_elements' ) {
 		return $can_cancel;
 	}
 
@@ -131,12 +131,8 @@ add_filter( 'rcp_membership_can_cancel', 'rcp_elements_can_cancel', 10, 3 );
  * @return true|WP_Error True if the cancellation was successful, WP_Error on failure.
  */
 function rcp_elements_cancel( $success, $gateway, $gateway_subscription_id, $membership_id, $membership ) {
-	// If it was already cancelled, bail.
-	if ( $success ) {
-		return $success;
-	}
-
-	if ( 'stripe_elements' != $gateway ) {
+	// If it was already cancelled or not Stripe Elements gateway, bail.
+	if ( $success || $gateway !== 'stripe_elements' ) {
 		return $success;
 	}
 
