@@ -96,3 +96,46 @@ function rcp_elements_is_update_card_page() {
 
 	return false;
 }
+
+/**
+ * Checks if the membership can be cancelled
+ *
+ * @param bool           $can_cancel    Whether or not the membership can be cancelled.
+ * @param int            $membership_id ID of the membership being checked.
+ * @param RCP_Membership $membership    Membership object.
+ *
+ * @return bool Whether or not the membership can be cancelled.
+ */
+function rcp_elements_can_cancel( $can_cancel, $membership_id, $membership ) {
+	if ( $membership->get_gateway() !== 'stripe_elements' ) {
+		return $can_cancel;
+	}
+
+	if ( $membership->is_active() && $membership->is_recurring() && rcp_is_stripe_membership( $membership ) ) {
+		$can_cancel = true;
+	}
+
+	return $can_cancel;
+}
+add_filter( 'rcp_membership_can_cancel', 'rcp_elements_can_cancel', 10, 3 );
+
+/**
+ * Cancel a Stripe Elements membership
+ *
+ * @param bool           $success                 Whether or not the cancellation was successful.
+ * @param string         $gateway                 Payment gateway used for the membership.
+ * @param string         $gateway_subscription_id Gateway subscription ID.
+ * @param int            $membership_id           ID of the membership being cancelled.
+ * @param RCP_Membership $membership              Membership object.
+ *
+ * @return true|WP_Error True if the cancellation was successful, WP_Error on failure.
+ */
+function rcp_elements_cancel( $success, $gateway, $gateway_subscription_id, $membership_id, $membership ) {
+	// If it was already cancelled or not Stripe Elements gateway, bail.
+	if ( $success || $gateway !== 'stripe_elements' ) {
+		return $success;
+	}
+
+	return rcp_stripe_cancel_membership( $gateway_subscription_id );
+}
+add_filter( 'rcp_membership_payment_profile_cancelled', 'rcp_elements_cancel', 10, 5 );
